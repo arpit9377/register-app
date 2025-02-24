@@ -61,7 +61,7 @@ Ensure you have the following installed:
 ### **Installation Steps**
 1. **Clone the Repository**
    ```sh
-   git clone https://github.com/your-username/repo-name.git
+   git clone https://github.com/arpit9377/register-app
    cd repo-name
    ```
 
