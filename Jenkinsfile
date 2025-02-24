@@ -36,6 +36,29 @@ pipeline{
                  sh "mvn test"
            }
        }
+
+       
+       //Your sonarqube Instance t2.micro is not sufficient to run sonarqube
+       //however, i have done the setup, you have to enable it on VM & configre things on sonar dashboard
+       /* stage("SonarQube Analysis"){
+           steps {
+	           script {
+		        withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') { 
+                        sh "mvn sonar:sonar"
+		        }
+	           }	
+           }
+       }
+
+       stage("Quality Gate"){
+           steps {
+               script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'jenkins-sonarqube-token'
+                }	
+            }
+
+        } */
+
         stage("Build & Push Docker Image") {
             steps {
                 script {
@@ -50,6 +73,22 @@ pipeline{
                 }
             }
 
+       }
+          stage("Trivy Scan") {
+           steps {
+               script {
+	            sh ('docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image arpit3004/register-app-pipeline:latest --no-progress --scanners vuln  --exit-code 0 --severity HIGH,CRITICAL --format table')
+               }
+           }
+       }
+
+       stage ('Cleanup Artifacts') {
+           steps {
+               script {
+                    sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG}"
+                    sh "docker rmi ${IMAGE_NAME}:latest"
+               }
+          }
        }
 
     }
